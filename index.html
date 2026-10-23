@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f0e7">
+<meta name="description" content="侨乡金埭·南洋归埕数字展览。以村落规划、建筑更新、五行主题空间、文化IP、夜游设计与AIGC影像重新讲述侨乡记忆。">
+<title>南洋归埕｜侨乡金埭数字展览</title>
+<style>
+:root{
+ --paper:#f5f0e7;--paper2:#eee5d8;--brick:#984b37;--brick-dark:#713b2e;
+ --ink:#352a24;--muted:#817367;--line:#d7c7b5;--white:#fffdf8;
+ --serif:"Noto Serif SC","Songti SC","STSong","SimSun",serif;
+ --sans:Inter,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);overflow-x:hidden}
+button{font:inherit}
+a{color:inherit}
+::selection{background:#b96f55;color:white}
+.topline{height:3px;background:linear-gradient(90deg,var(--brick),#c79b73,var(--brick))}
+.sitehead{padding:22px clamp(18px,5vw,76px) 12px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.seal{width:38px;height:38px;border:1px solid var(--brick);color:var(--brick);display:grid;place-items:center;font-family:var(--serif);font-size:21px;flex:none}
+.brandname{font-family:var(--serif);font-size:17px;letter-spacing:.12em}
+.branden{font:9px var(--sans);color:var(--muted);letter-spacing:.18em;margin-top:4px}
+.headnote{font-size:10px;letter-spacing:.15em;color:var(--muted);text-align:right}
+.hero{position:relative;padding:16px 0 0;overflow:hidden}
+.hero-title{text-align:center;position:relative;z-index:3;padding:16px 18px 0}
+.kicker{font-size:10px;letter-spacing:.25em;color:var(--brick);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:500;letter-spacing:.2em;font-size:clamp(36px,6vw,70px);margin:13px 0 10px}
+.lead{font-family:var(--serif);font-size:clamp(13px,1.7vw,17px);letter-spacing:.14em;color:#68564a}
+.lead-en{font-size:9px;color:#a09183;letter-spacing:.2em;margin-top:12px}
+.hero:before{content:"";position:absolute;left:50%;top:38%;width:min(78vw,790px);aspect-ratio:1;border:1px solid #ad7c6035;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+.hero:after{content:"";position:absolute;left:50%;top:38%;width:min(58vw,570px);aspect-ratio:1;border:1px solid #ad7c6022;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+.stage{height:clamp(480px,65vw,700px);max-height:700px;min-height:480px;position:relative;perspective:1450px;overflow:hidden;touch-action:pan-y;isolation:isolate}
+.stage:before{content:"";position:absolute;left:0;right:0;top:48%;height:1px;background:linear-gradient(90deg,transparent,#b99b7d66 15%,#b99b7d66 85%,transparent)}
+.stage-label{position:absolute;top:12px;left:0;right:0;text-align:center;font-size:9px;letter-spacing:.22em;color:#a18e7d;z-index:4}
+.center-stamp{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:12px;color:#a66b51;opacity:.45;pointer-events:none;z-index:0}
+.center-stamp .vertical{font-family:var(--serif);font-size:clamp(32px,5vw,60px);writing-mode:vertical-rl;letter-spacing:.2em}
+.center-stamp .ring{width:clamp(90px,15vw,160px);aspect-ratio:1;border:1px solid #a66b5145;border-radius:50%;display:grid;place-items:center}
+.center-stamp .ring:before{content:"";width:70%;height:70%;border:1px solid #a66b5133;border-radius:50%}
+.cards{position:absolute;inset:0;transform-style:preserve-3d}
+.poster{position:absolute;left:50%;top:48%;width:clamp(135px,17vw,210px);aspect-ratio:1/2;background:#e4d7c7;border:1px solid #d4c1ab;box-shadow:0 24px 55px #44312522;overflow:hidden;transform-style:preserve-3d;will-change:transform,opacity;cursor:pointer;transition:transform 1.15s cubic-bezier(.18,.76,.22,1),opacity .7s,filter .7s,box-shadow .7s}
+.poster img{width:100%;height:100%;display:block;object-fit:cover}
+.poster:after{content:"";position:absolute;inset:0;border:1px solid #fff7;pointer-events:none}
+.poster.duplicate{pointer-events:none}
+.caption{position:absolute;bottom:17px;left:16px;right:16px;text-align:center;z-index:4;transition:opacity .35s}
+.caption .count{font:10px var(--sans);letter-spacing:.18em;color:var(--brick)}
+.caption h2{font-family:var(--serif);font-size:clamp(18px,2vw,23px);font-weight:500;letter-spacing:.12em;margin:8px 0 5px}
+.caption p{font-family:var(--serif);font-size:11px;color:var(--muted);margin:0;letter-spacing:.06em}
+body.intro .caption{opacity:0}
+body.intro .center-stamp{opacity:.08}
+body.intro .hero:before,body.intro .hero:after{opacity:.3}
+.actionrow{display:flex;justify-content:center;align-items:center;gap:8px;padding:2px 16px 34px;position:relative;z-index:5}
+.btn{border:1px solid var(--line);background:#faf7f0;color:var(--ink);padding:11px 15px;font-size:11px;letter-spacing:.06em;cursor:pointer;transition:background .2s,border-color .2s}
+.btn:hover{border-color:var(--brick)}
+.btn.primary{background:var(--brick);border-color:var(--brick);color:#fffaf3}
+.btn.primary:hover{background:var(--brick-dark)}
+.section{padding:64px clamp(18px,6vw,88px)}
+.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:20px;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:28px}
+.sectioneyebrow{font-size:9px;letter-spacing:.24em;color:var(--brick);margin-bottom:9px}
+.sectionhead h2{font-family:var(--serif);font-weight:500;font-size:clamp(24px,3.4vw,38px);letter-spacing:.12em;margin:0}
+.sectionhead p{max-width:360px;font-family:var(--serif);font-size:12px;line-height:1.9;color:var(--muted);margin:0}
+.story{background:#eee5d8;border-top:1px solid #e0d3c2;border-bottom:1px solid #e0d3c2}
+.storygrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(28px,7vw,100px);align-items:center}
+.storyquote{font-family:var(--serif);font-size:clamp(26px,4vw,45px);line-height:1.55;letter-spacing:.08em;color:var(--brick-dark)}
+.storycopy{font-family:var(--serif);font-size:14px;line-height:2.1;color:#67594e}
+.storycopy p{margin:0 0 12px}
+.story-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.story-tags span{border:1px solid #cdb7a2;color:#85614d;padding:7px 11px;font-size:10px;letter-spacing:.08em}
+.boardgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.board{border:1px solid var(--line);background:var(--white);padding:0;text-align:left;cursor:pointer;display:flex;flex-direction:column;transition:transform .25s,box-shadow .25s,border-color .25s;min-width:0}
+.board:hover{transform:translateY(-5px);box-shadow:0 18px 35px #4a352116;border-color:#b68b6d}
+.boardvisual{aspect-ratio:1/1.65;overflow:hidden;background:#e5dbce;position:relative}
+.boardvisual img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .5s}
+.board:hover .boardvisual img{transform:scale(1.025)}
+.boardvisual:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px #ffffff44}
+.boardmeta{padding:15px 14px 17px}
+.boardnum{font:10px var(--sans);letter-spacing:.18em;color:var(--brick)}
+.boardtitle{font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.5;margin:7px 0}
+.boarddesc{font-family:var(--serif);font-size:11px;line-height:1.8;color:var(--muted);margin:0}
+.openlabel{display:inline-flex;align-items:center;gap:7px;margin-top:13px;font-size:10px;letter-spacing:.06em;color:var(--brick)}
+.openlabel:after{content:"↗";font-size:14px}
+.route{background:#3c3028;color:#f5eee4;position:relative;overflow:hidden}
+.route:before{content:"归";position:absolute;right:-.04em;bottom:-.4em;font-family:var(--serif);font-size:clamp(180px,32vw,440px);color:#ffffff07;line-height:1;pointer-events:none}
+.route .sectioneyebrow{color:#d6a28a}
+.route .sectionhead{border-color:#76685b}
+.route .sectionhead p{color:#c2b4a5}
+.routegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.routeitem{padding:18px 22px 10px 0;border-right:1px solid #77685a;margin-right:22px;min-height:155px}
+.routeitem:last-child{border:0;margin:0}
+.routeitem .rnum{font:11px var(--sans);color:#d79c80;letter-spacing:.15em}
+.routeitem h3{font-family:var(--serif);font-size:19px;font-weight:400;letter-spacing:.1em;margin:17px 0 9px}
+.routeitem p{font-family:var(--serif);font-size:11px;line-height:1.9;color:#c9bbae;margin:0}
+.endcard{text-align:center;padding:68px 18px 74px}
+.endcard .mini{font:9px var(--sans);letter-spacing:.25em;color:var(--brick)}
+.endcard h2{font-family:var(--serif);font-size:clamp(29px,5vw,49px);font-weight:500;letter-spacing:.2em;margin:14px 0}
+.endcard p{font-family:var(--serif);font-size:12px;letter-spacing:.08em;color:var(--muted)}
+.footer{border-top:1px solid var(--line);padding:20px clamp(18px,5vw,76px);display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:9px;letter-spacing:.12em}
+.viewer{position:fixed;inset:0;background:#241c17f5;z-index:50;display:none;flex-direction:column;padding:18px;align-items:center;justify-content:center}
+.viewer.open{display:flex}
+.viewerbar{width:min(1100px,100%);display:flex;justify-content:space-between;align-items:center;color:#f8f1e8;padding:0 0 12px}
+.viewerbar span{font-size:10px;letter-spacing:.15em}
+.viewer img{max-width:min(90vw,1000px);max-height:calc(100vh - 100px);object-fit:contain;box-shadow:0 10px 60px #0004}
+.close{border:1px solid #ffffff70;background:transparent;color:white;width:38px;height:38px;font-size:23px;cursor:pointer}
+.viewerhelp{font-size:10px;color:#c7b7a8;margin-top:10px}
+
+.film-section{background:#e9dfd2;border-top:1px solid #d8c7b5;border-bottom:1px solid #d8c7b5}
+.film-layout{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.35fr);gap:clamp(24px,5vw,68px);align-items:center}
+.film-copy .film-kicker{font-size:9px;letter-spacing:.24em;color:var(--brick);margin-bottom:14px}
+.film-copy h2{font-family:var(--serif);font-size:clamp(27px,4vw,44px);font-weight:500;line-height:1.5;letter-spacing:.12em;margin:0 0 14px}
+.film-copy p{font-family:var(--serif);font-size:13px;line-height:2.05;color:#6e5b4e;margin:0 0 12px}
+.film-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.film-meta span{border:1px solid #c8ad97;color:#805e4b;padding:7px 10px;font-size:10px;letter-spacing:.08em}
+.film-frame{background:#201914;padding:7px;box-shadow:0 24px 50px #4a35211c}
+.film-frame video{width:100%;display:block;aspect-ratio:960/544;object-fit:contain;background:#171310}
+.film-note{font-size:10px;color:#8b796b;margin-top:9px;line-height:1.8}
+@media(max-width:850px){.film-layout{grid-template-columns:1fr;gap:22px}}
+
+@media(max-width:850px){.boardgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.storygrid{grid-template-columns:1fr;gap:20px}.routegrid{grid-template-columns:repeat(2,1fr);row-gap:20px}.routeitem:nth-child(2){border-right:0}.routeitem:nth-child(3){margin-top:5px}.section{padding-top:48px;padding-bottom:48px}}
+@media(max-width:560px){.sitehead{padding-top:16px}.headnote{display:none}.hero{padding-top:5px}.hero-title{padding-top:16px}.stage{height:510px;min-height:510px}.poster{width:clamp(120px,37vw,158px)}.center-stamp{gap:6px}.center-stamp .ring{width:75px}.center-stamp .vertical{font-size:31px}.caption{bottom:13px}.actionrow{gap:6px;padding-bottom:25px}.btn{padding:10px 10px;font-size:10px}.sectionhead{display:block}.sectionhead p{margin-top:12px}.boardmeta{padding:11px 10px 13px}.boardtitle{font-size:14px}.boarddesc{font-size:10px}.routeitem{padding-right:12px;margin-right:12px}.routeitem h3{font-size:17px}.footer{line-height:1.8}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.poster,.board,.boardvisual img{transition:none!important}}
+
+/* ORBIT-style prologue and circular gallery */
+.intro-overlay{position:fixed;inset:0;z-index:1000;background:radial-gradient(ellipse at 50% 54%,#fffdf8 0%,#f5f0e7 48%,#e9dfd1 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;opacity:1;visibility:visible;transition:opacity .85s ease,visibility .85s ease;color:var(--ink)}
+.intro-overlay:before,.intro-overlay:after{content:"";position:absolute;left:50%;top:55%;width:min(92vw,900px);aspect-ratio:1;border:1px solid #9d493a24;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+.intro-overlay:after{width:min(68vw,650px);border-color:#9d493a18}
+.intro-overlay.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+.intro-brand{position:absolute;top:clamp(20px,4vh,42px);left:clamp(20px,5vw,70px);z-index:5;display:flex;align-items:center;gap:10px}
+.intro-brand-mark{width:34px;height:34px;border:1px solid var(--brick);display:grid;place-items:center;color:var(--brick);font-family:var(--serif);font-size:20px}
+.intro-brand-text{font-size:11px;letter-spacing:.16em}.intro-brand-text small{display:block;font:8px var(--sans);letter-spacing:.18em;color:var(--muted);margin-top:4px}
+.intro-topnote{position:absolute;right:clamp(20px,5vw,70px);top:clamp(25px,4.5vh,48px);font-size:9px;letter-spacing:.18em;color:#9b8877;text-align:right;z-index:5}
+.intro-copy{position:absolute;left:clamp(22px,8vw,120px);top:50%;transform:translateY(-54%);z-index:5;pointer-events:none;max-width:360px;text-shadow:0 1px 0 #f5f0e7}
+.intro-eyebrow{font-size:9px;letter-spacing:.24em;color:var(--brick);margin-bottom:19px}
+.intro-copy h2{font-family:var(--serif);font-size:clamp(34px,5.3vw,66px);font-weight:400;letter-spacing:.12em;line-height:1.45;margin:0;color:#392c25}
+.intro-copy p{font-family:var(--serif);font-size:13px;letter-spacing:.12em;color:#887567;margin:18px 0 0}
+.intro-progress{display:flex;align-items:center;gap:10px;margin-top:30px;font:9px var(--sans);letter-spacing:.15em;color:#a18e7d}
+.intro-progress-line{width:100px;height:1px;background:#d8c8b7;position:relative;overflow:hidden}.intro-progress-line:after{content:"";position:absolute;inset:0;background:var(--brick);transform-origin:left;animation:intro-progress 2.85s linear forwards}
+@keyframes intro-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.intro-orbit-wrap{position:absolute;left:62%;top:53%;width:min(56vw,690px);height:min(75vh,660px);transform:translate(-50%,-50%);perspective:1450px;z-index:2}
+.intro-orbit{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+.intro-card{position:absolute;left:50%;top:50%;width:clamp(105px,12.5vw,176px);aspect-ratio:1/2;background:#e7dbcb;border:1px solid #d1bca7;box-shadow:0 22px 45px #49332620;overflow:hidden;backface-visibility:hidden;will-change:transform,opacity}
+.intro-card img{width:100%;height:100%;object-fit:cover;display:block}
+.intro-skip{position:absolute;right:clamp(20px,5vw,70px);bottom:clamp(22px,4vh,42px);z-index:6;border:1px solid #cbb7a3;background:#f8f3ebcc;color:#725d4e;padding:11px 16px;font-size:10px;letter-spacing:.1em;cursor:pointer;backdrop-filter:blur(8px)}
+.intro-foot{position:absolute;left:clamp(20px,5vw,70px);bottom:clamp(24px,4vh,42px);font-size:9px;letter-spacing:.17em;color:#a18e7d;z-index:5}
+body.intro{overflow:hidden}
+.stage{perspective:1600px}
+.poster{transition:transform 1s cubic-bezier(.2,.72,.2,1),opacity .75s,filter .75s,box-shadow .75s}
+@media(max-width:760px){.intro-copy{left:0;right:0;top:14%;transform:none;text-align:center;max-width:none;padding:0 18px}.intro-copy h2{font-size:clamp(30px,8vw,44px);line-height:1.3}.intro-eyebrow{margin-bottom:9px}.intro-copy p{font-size:11px;margin-top:9px}.intro-progress{justify-content:center;margin-top:12px}.intro-orbit-wrap{left:50%;top:62%;width:100vw;height:48vh;min-height:300px}.intro-card{width:clamp(78px,23vw,120px)}.intro-brand-text{font-size:10px}.intro-topnote{font-size:8px}.intro-foot{max-width:190px;line-height:1.7}.intro-skip{font-size:9px;padding:10px 12px}.stage{height:560px;min-height:560px}.poster{width:clamp(105px,29vw,155px)}}
+@media(prefers-reduced-motion:reduce){.intro-progress-line:after{animation:none;transform:scaleX(1)}.intro-overlay,.poster{transition:none!important}}
+
+</style>
+</head>
+<body class="intro">
+
+<div class="intro-overlay" id="introOverlay" aria-label="南洋归埕展览开场">
+ <div class="intro-brand"><div class="intro-brand-mark">埕</div><div class="intro-brand-text">南洋归埕<small>JINDAI · DIGITAL EXHIBITION</small></div></div>
+ <div class="intro-topnote">A DIGITAL EXHIBITION<br>NO. 001 — JINDAI VILLAGE</div>
+ <div class="intro-copy"><div class="intro-eyebrow">ORBIT / PROLOGUE</div><h2>每一面，<br>都是一个世界。</h2><p>正在进入南洋归埕</p><div class="intro-progress"><span>MEMORY IN MOTION</span><span class="intro-progress-line"></span><span>08</span></div></div>
+ <div class="intro-orbit-wrap"><div class="intro-orbit" id="introOrbit"></div></div>
+ <div class="intro-foot">侨乡金埭 · 传统村落文化活化与空间更新</div>
+ <button class="intro-skip" id="skipIntro">跳过开场 ↗</button>
+</div>
+
+<div class="topline"></div>
+<header class="sitehead">
+ <div class="brand"><div class="seal">埕</div><div><div class="brandname">南洋归埕</div><div class="branden">JINDAI · OVERSEAS CHINESE HERITAGE</div></div></div>
+ <div class="headnote">侨乡金埭<br>传统村落文化活化与空间更新</div>
+</header>
+<main>
+<section class="hero" id="home">
+ <div class="hero-title">
+  <div class="kicker">A DIGITAL EXHIBITION · JINDAI VILLAGE</div>
+  <h1>南洋归埕</h1>
+  <div class="lead">让远行的记忆，重新回到生活发生的地方。</div>
+  <div class="lead-en">MEMORY · PLACE · RETURN</div>
+ </div>
+ <div class="stage" id="stage" aria-label="动态展板展示区">
+  <div class="stage-label" id="stageLabel">MEMORIES IN MOTION / 记忆正在汇聚</div>
+  <div class="center-stamp"><div class="ring"></div><div class="vertical">归埕</div></div>
+  <div class="cards" id="cards"></div>
+  <div class="caption"><div class="count" id="activeCount">03 / 08</div><h2 id="activeTitle">归埕意象与场地叙事</h2><p id="activeSub">从村落记忆，走向文化重聚</p></div>
+ </div>
+ <div class="actionrow">
+  <button class="btn" id="prev">← 上一展板</button>
+  <button class="btn primary" id="replay">重播开场</button>
+  <button class="btn" id="next">下一展板 →</button>
+  <button class="btn" id="allBtn">浏览全部 ↓</button>
+  <button class="btn" id="watchFilmBtn">观看项目影像 ▷</button>
+  <button class="btn" id="autoOrbitBtn">▷ 自动环游</button>
+ </div>
+</section>
+
+<section class="story" id="concept">
+ <div class="section">
+  <div class="storygrid">
+   <div>
+    <div class="sectioneyebrow">THE IDEA / 核心命题</div>
+    <div class="storyquote">侨乡，不只是出海的地方。<br>也是记忆归来的地方。</div>
+   </div>
+   <div class="storycopy">
+    <p>「南洋归埕」以福建石狮金埭村为设计对象，从闽南侨乡的迁徙记忆、传统建筑、信俗文化与日常生活出发，探索传统村落文化活化与空间更新的可能。</p>
+    <p>「埕」是村落中承载交往、仪式与日常的公共场所；「归埕」则意味着人、记忆与生活方式重新回到村庄。设计通过总体规划、传统建筑更新、五行主题空间、村落导视、夜游体验、文化 IP 与 AIGC 影像，让侨乡文化从历史背景转化为可识别、可参与、可传播的体验。</p>
+    <div class="story-tags"><span>空间可识别</span><span>文化可参与</span><span>内容可传播</span><span>记忆再连接</span></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="section film-section" id="film">
+ <div class="film-layout">
+  <div class="film-copy">
+   <div class="film-kicker">THE PROJECT FILM / 影像叙事</div>
+   <h2>一纸归埕<br>让记忆穿越山海</h2>
+   <p>从海上漂来的一封侨批出发，循着迁徙、乡情与归来的线索，重新认识金埭村的历史记忆与文化脉络。</p>
+   <p>这段项目影像将作为展板之外的另一条叙事路径，让观众从静态设计图进入时间、人物与场景共同构成的故事。</p>
+   <div class="film-meta"><span>PROJECT FILM</span><span>约 4 分 41 秒</span><span>建议开启声音</span></div>
+  </div>
+  <div><div class="film-frame"><video id="projectFilm" controls playsinline preload="metadata" poster="images/film-poster.jpg">
+   <source src="media/nanyang-guicheng-film.mp4" type="video/mp4">
+   当前浏览器暂不支持视频播放，请使用现代浏览器打开本页面。
+  </video></div><div class="film-note">提示：首次播放需要加载视频文件；正式部署时请确保 media/nanyang-guicheng-film.mp4 与网页一同上传。</div></div>
+ </div>
+</section>
+
+<section class="section" id="collection">
+ <div class="sectionhead">
+  <div><div class="sectioneyebrow">THE COLLECTION / 01—08</div><h2>八个切面，一场归来</h2></div>
+  <p>按照展板原始顺序，从项目主视觉与场地解读出发，进入总体规划、建筑更新、五行空间、文化场景、IP 系统、夜游导视与 AIGC 叙事。</p>
+ </div>
+ <div class="boardgrid" id="boardGrid"></div>
+</section>
+
+<section class="route" id="journey">
+ <div class="section">
+  <div class="sectionhead">
+   <div><div class="sectioneyebrow">THE JOURNEY / DESIGN NARRATIVE</div><h2>从村落，到生活</h2></div>
+   <p>以空间为骨架，以文化为线索，以体验为媒介，让传统村落重新成为日常生活发生的地方。</p>
+  </div>
+  <div class="routegrid">
+   <div class="routeitem"><div class="rnum">01 / READ</div><h3>读懂金埭</h3><p>梳理侨乡历史、村落肌理、现状问题与文化资源，找到更新的真实起点。</p></div>
+   <div class="routeitem"><div class="rnum">02 / RECONNECT</div><h3>重组空间</h3><p>以总体规划、游览路径与节点设计建立连续、清晰且可体验的村落空间。</p></div>
+   <div class="routeitem"><div class="rnum">03 / EXPERIENCE</div><h3>让文化发生</h3><p>将五行文化、传统建筑、非遗活动与夜游场景转化为可参与的体验。</p></div>
+   <div class="routeitem"><div class="rnum">04 / CONTINUE</div><h3>让记忆延续</h3><p>通过文化 IP、视觉导览与数字媒介，让金埭的故事被看见、理解与分享。</p></div>
+  </div>
+ </div>
+</section>
+
+<section class="endcard">
+ <div class="mini">A PLACE TO RETURN · A STORY TO CONTINUE</div>
+ <h2>归于一埕</h2>
+ <p>让村落的过去，继续参与今天的生活。</p>
+ <button class="btn primary" id="backTop">回到展览起点 ↑</button>
+</section>
+</main>
+<footer class="footer"><span>侨乡金埭 · 南洋归埕</span><span>JINDAI VILLAGE / DIGITAL EXHIBITION</span><span>八张展板 · 线上展览</span></footer>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="展板高清查看">
+ <div class="viewerbar"><span id="viewerTitle">BOARD 01 / 08</span><button class="close" id="closeViewer" aria-label="关闭">×</button></div>
+ <img id="fullImage" alt="展板高清大图">
+ <div class="viewerhelp">按 ESC 或点击右上角关闭 · 图片保持完整比例</div>
+</div>
+
+<script>
+const boards = [
+ {title:"项目主视觉与场地解读",en:"PROJECT IDENTITY & SITE READING",sub:"从归埕意象进入金埭的历史与现实",desc:"以中心视觉意象建立项目主题，并通过村落历史、人口生活与场地现状分析，梳理传统聚落更新的文化基础。"},
+ {title:"村落总体规划与游线",en:"MASTERPLAN & VILLAGE ROUTES",sub:"以整体空间结构串联村落文化节点",desc:"通过村落鸟瞰、空间分析、功能分区、交通分析与旅游路线，组织金埭的空间秩序，形成连续、可识别的游览网络。"},
+ {title:"建筑设计与空间更新",en:"ARCHITECTURE & SPATIAL REGENERATION",sub:"在传统肌理中植入新的公共生活",desc:"从传统建筑形态、材料、构造和空间关系出发，结合更新后的建筑场景与室内空间，探索新旧建筑协调共生的方式。"},
+ {title:"五行主题空间设计",en:"FIVE ELEMENTS SPATIAL DESIGN",sub:"金、木、水、火、土转译为场所体验",desc:"以五行文化为设计线索，分别提取形态、材料、色彩和空间氛围，形成具有差异化识别度的主题场景与体验节点。"},
+ {title:"传统街巷与文化场景",en:"HERITAGE STREETS & DAILY LIFE",sub:"让古厝、街巷与公共生活重新连接",desc:"以闽南传统街巷、古厝院落和公共场景为基础，结合文化活动与建筑更新，呈现村落生活延续与空间活化的可能。"},
+ {title:"文化 IP 与数字延展",en:"CULTURAL IP & DIGITAL EXTENSION",sub:"让地方文化拥有可识别的当代表达",desc:"从主角色、五行 IP、角色关系到文创产品、线下商业和手机端界面，构建可跨越空间、媒介与日常使用的文化识别系统。"},
+ {title:"导视系统与夜游设计",en:"WAYFINDING & NIGHT TOUR",sub:"用标识、光影与路线组织夜间体验",desc:"整合村落入口导视、方向指引、节点标识、夜游装置、路线图与生成逻辑，建立从识路到沉浸体验的夜间游览系统。"},
+ {title:"一纸归埕：AIGC 叙事影像",en:"AIGC STORYTELLING & FILM",sub:"以侨批为线索讲述乡情与归来",desc:"通过角色形象、场景生成、关键帧时间线与视听语言，把金埭文化转化为可感知、可观看、可传播的数字故事。"}
+];
+const imagePaths=["images/board-01.jpg","images/board-02.jpg","images/board-03.png","images/board-04.jpg","images/board-05.jpg","images/board-06.jpg","images/board-07.jpg","images/board-08.png"];
+const cardsBox=document.getElementById('cards'),stage=document.getElementById('stage'),grid=document.getElementById('boardGrid');
+const cards=[],uniqueCards=[];
+let phase='intro',active=2,angle=0,startTime=performance.now(),dragging=false,lastX=0,dragDistance=0,animFrame=0;
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const repeatCount=40;
+
+function makeCard(index,duplicate){
+ const c=document.createElement('div');c.className='poster'+(duplicate?' duplicate':'');c.dataset.index=index;c.dataset.duplicate=duplicate?'1':'0';
+ const im=document.createElement('img');im.src=imagePaths[index];im.alt=boards[index].title;im.loading=duplicate?'lazy':'eager';im.decoding='async';
+ c.appendChild(im);cardsBox.appendChild(c);cards.push(c);if(!duplicate)uniqueCards.push(c);
+ c.addEventListener('click',()=>{
+  if(dragDistance>8)return;
+  if(phase==='intro'){active=index;finishIntro();return}
+  if(active===index){openViewer(index)}else{active=index;renderDisplay();updateCaption()}
+ });
+ return c;
+}
+for(let i=0;i<8;i++)makeCard(i,false);
+for(let i=0;i<repeatCount-8;i++)makeCard(i%8,true);
+
+const introOrbit=document.getElementById('introOrbit'),introOverlay=document.getElementById('introOverlay');
+const introCards=[];
+for(let i=0;i<8;i++){
+ const c=document.createElement('div');c.className='intro-card';
+ const im=document.createElement('img');im.src=imagePaths[i];im.alt=boards[i].title;im.loading='eager';im.decoding='async';c.appendChild(im);introOrbit.appendChild(c);introCards.push(c);
+}
+let introStart=performance.now(),introDone=false,autoOrbit=false,autoOrbitFrame=null;
+function renderIntroOrbit(elapsed){
+ const wrap=document.querySelector('.intro-orbit-wrap'),w=wrap.clientWidth,mobile=window.innerWidth<760;
+ const radius=(mobile?Math.min(w*.34,145):Math.min(w*.39,285));
+ const rotation=-(Math.min(elapsed,2850)/2850)*360;
+ introCards.forEach((c,i)=>{
+  const theta=i*45+rotation;
+  const rad=theta*Math.PI/180;
+  const depth=Math.cos(rad);
+  const z=Math.sin(rad);
+  const scale=.72+((depth+1)/2)*.43;
+  const x=Math.sin(rad)*radius;
+  const y=Math.cos(rad)*radius*.12;
+  c.style.transform=`translate(-50%,-50%) translate3d(${x}px,${y}px,${z*radius*.58}px) rotateY(${theta}deg) scale(${scale})`;
+  c.style.zIndex=String(Math.round(20+depth*20));
+  c.style.opacity=String(.3+Math.max(0,depth)*.7);
+ });
+}
+function closeIntro(){if(introDone)return;introDone=true;phase='display';introOverlay.classList.add('is-leaving');document.body.classList.remove('intro');renderDisplay();updateCaption();setTimeout(()=>{introOverlay.style.display='none'},900)}
+document.getElementById('skipIntro').addEventListener('click',closeIntro);
+
+boards.forEach((b,i)=>{
+ const item=document.createElement('button');item.className='board';item.type='button';
+ item.innerHTML=`<div class="boardvisual"><img src="${imagePaths[i]}" alt="${b.title}" loading="lazy" decoding="async"></div><div class="boardmeta"><div class="boardnum">${String(i+1).padStart(2,'0')} / 08　${b.en}</div><div class="boardtitle">${b.title}</div><p class="boarddesc">${b.desc}</p><span class="openlabel">查看完整展板</span></div>`;
+ item.addEventListener('click',()=>openViewer(i));grid.appendChild(item);
+});
+function place(c,transform,z,opacity,blur=0){c.style.transform=transform;c.style.zIndex=String(z);c.style.opacity=String(opacity);c.style.filter=blur?`blur(${blur}px)`:'none'}
+function renderIntro(progress){
+ // Keep the main gallery already arranged as a ring underneath the prologue overlay.
+ renderDisplay();
+}
+function renderDisplay(){
+ const w=stage.clientWidth,mobile=w<620;
+ const radius=mobile?Math.min(w*.62,245):Math.min(w*.42,475);
+ cards.forEach(c=>{
+  const i=Number(c.dataset.index),duplicate=c.dataset.duplicate==='1';
+  if(duplicate){place(c,'translate(-50%,-50%) scale(.15)',0,0);return}
+  const theta=(i-active)*45;
+  const rad=theta*Math.PI/180;
+  const depth=Math.cos(rad);
+  const x=Math.sin(rad)*radius;
+  const y=(1-depth)*(mobile?18:25);
+  const z=depth*radius*.62;
+  const scale=.7+((depth+1)/2)*.36;
+  const opacity=.22+Math.max(0,depth)*.78;
+  place(c,`translate(-50%,-50%) translate3d(${x}px,${y}px,${z}px) rotateY(${theta}deg) scale(${scale})`,Math.round(20+depth*20),opacity,depth<-.2?.4:0);
+ });
+}
+function updateCaption(){
+ document.getElementById('activeCount').textContent=String(active+1).padStart(2,'0')+' / 08';
+ document.getElementById('activeTitle').textContent=boards[active].title;
+ document.getElementById('activeSub').textContent=boards[active].sub;
+}
+function finishIntro(){closeIntro()}
+function replay(){
+ introDone=false;phase='intro';document.body.classList.add('intro');introOverlay.style.display='flex';introOverlay.classList.remove('is-leaving');introStart=performance.now();
+ introCards.forEach(c=>{c.style.opacity='1'});
+}
+function step(d){if(phase==='intro')finishIntro();active=(active+d+8)%8;renderDisplay();updateCaption()}
+document.getElementById('prev').addEventListener('click',()=>step(-1));
+document.getElementById('next').addEventListener('click',()=>step(1));
+document.getElementById('replay').addEventListener('click',replay);
+document.getElementById('allBtn').addEventListener('click',()=>document.getElementById('collection').scrollIntoView({behavior:reduced?'auto':'smooth'}));
+document.getElementById('watchFilmBtn').addEventListener('click',()=>document.getElementById('film').scrollIntoView({behavior:reduced?'auto':'smooth'}));
+document.getElementById('autoOrbitBtn').addEventListener('click',e=>{autoOrbit=!autoOrbit;e.currentTarget.textContent=autoOrbit?'Ⅱ 暂停环游':'▷ 自动环游';});
+document.getElementById('backTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:reduced?'auto':'smooth'}));
+stage.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;dragDistance=0;try{stage.setPointerCapture(e.pointerId)}catch(_){}});
+stage.addEventListener('pointermove',e=>{
+ if(!dragging)return;const dx=e.clientX-lastX;dragDistance+=Math.abs(dx);lastX=e.clientX;
+ if(phase==='intro'){angle+=dx*.008;renderIntro(Math.min(1,(performance.now()-startTime)/900))}
+ else if(dragDistance>45){active=(active+(dx<0?1:7))%8;renderDisplay();updateCaption();dragDistance=0}
+});
+stage.addEventListener('pointerup',()=>{dragging=false;setTimeout(()=>dragDistance=0,100)});
+stage.addEventListener('pointercancel',()=>dragging=false);
+function tick(now){
+ if(!introDone){const elapsed=now-introStart;renderIntroOrbit(elapsed);if(elapsed>2920)closeIntro()}
+ if(autoOrbit && phase==='display'){
+  if(now-(window._lastOrbitStep||0)>1700){active=(active+1)%8;renderDisplay();updateCaption();window._lastOrbitStep=now}
+ }
+ animFrame=requestAnimationFrame(tick);
+}
+const viewer=document.getElementById('viewer'),full=document.getElementById('fullImage');
+function openViewer(i){full.src=imagePaths[i];full.alt=boards[i].title;document.getElementById('viewerTitle').textContent=String(i+1).padStart(2,'0')+' / 08　'+boards[i].title;viewer.classList.add('open');document.body.style.overflow='hidden'}
+function closeViewer(){viewer.classList.remove('open');document.body.style.overflow=''}
+document.getElementById('closeViewer').addEventListener('click',closeViewer);
+viewer.addEventListener('click',e=>{if(e.target===viewer)closeViewer()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer();if(e.key==='ArrowRight'&&viewer.classList.contains('open')){const n=(boards.findIndex(b=>b.title===document.getElementById('viewerTitle').textContent.split('　')[1])+1+8)%8;openViewer(n)}});
+if(reduced){phase='display';introDone=true;introOverlay.style.display='none';document.body.classList.remove('intro');renderDisplay();updateCaption()}else{renderIntroOrbit(0);renderDisplay();updateCaption();animFrame=requestAnimationFrame(tick)}
+</script>
+</body>
+</html>
