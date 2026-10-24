@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#f5f0e7">
 <meta name="description" content="侨乡金埭·南洋归埕数字展览。以村落规划、建筑更新、五行主题空间、文化IP、夜游设计与AIGC影像重新讲述侨乡记忆。">
 <title>南洋归埕｜侨乡金埭数字展览</title>
+<link rel="preload" as="image" href="images/board-03.png" fetchpriority="high">
+<link rel="icon" href="data:,">
 <style>
 :root{
  --paper:#f5f0e7;--paper2:#eee5d8;--brick:#984b37;--brick-dark:#713b2e;
@@ -151,6 +153,20 @@ body.intro{overflow:hidden}
 @media(max-width:760px){.intro-copy{left:0;right:0;top:14%;transform:none;text-align:center;max-width:none;padding:0 18px}.intro-copy h2{font-size:clamp(30px,8vw,44px);line-height:1.3}.intro-eyebrow{margin-bottom:9px}.intro-copy p{font-size:11px;margin-top:9px}.intro-progress{justify-content:center;margin-top:12px}.intro-orbit-wrap{left:50%;top:62%;width:100vw;height:48vh;min-height:300px}.intro-card{width:clamp(78px,23vw,120px)}.intro-brand-text{font-size:10px}.intro-topnote{font-size:8px}.intro-foot{max-width:190px;line-height:1.7}.intro-skip{font-size:9px;padding:10px 12px}.stage{height:560px;min-height:560px}.poster{width:clamp(105px,29vw,155px)}}
 @media(prefers-reduced-motion:reduce){.intro-progress-line:after{animation:none;transform:scaleX(1)}.intro-overlay,.poster{transition:none!important}}
 
+
+/* Performance: promote layers only while they are moving, without changing geometry. */
+.poster,.intro-orbit,.intro-card{will-change:auto}
+body.intro .intro-card,.cards.is-moving .poster{will-change:transform,opacity}
+body.intro .poster{transition:none}
+.poster img,.intro-card img{opacity:0;transition:opacity .18s ease}
+.poster.is-loaded img,.intro-card.is-loaded img{opacity:1}
+.stage-load-status{position:absolute;left:0;right:0;bottom:2px;text-align:center;font-size:9px;color:var(--muted);pointer-events:none}
+.film-frame{position:relative}
+.film-load{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid #e8d4bcaa;background:#352a24e8;color:#fffdf8;padding:13px 21px;font:12px var(--sans);cursor:pointer;max-width:90%;white-space:nowrap}
+.film-load[hidden]{display:none}.film-load:disabled{cursor:progress}
+@media(max-width:760px){.intro-card{box-shadow:0 10px 24px #49332620}.poster{box-shadow:0 12px 30px #44312522}.intro-skip{backdrop-filter:none}}
+@media(prefers-reduced-motion:reduce){.poster img,.intro-card img{transition:none}}
+
 </style>
 </head>
 <body class="intro">
@@ -158,7 +174,7 @@ body.intro{overflow:hidden}
 <div class="intro-overlay" id="introOverlay" aria-label="南洋归埕展览开场">
  <div class="intro-brand"><div class="intro-brand-mark">埕</div><div class="intro-brand-text">南洋归埕<small>JINDAI · DIGITAL EXHIBITION</small></div></div>
  <div class="intro-topnote">A DIGITAL EXHIBITION<br>NO. 001 — JINDAI VILLAGE</div>
- <div class="intro-copy"><div class="intro-eyebrow">ORBIT / PROLOGUE</div><h2>每一面，<br>都是一个世界。</h2><p>正在进入南洋归埕</p><div class="intro-progress"><span>MEMORY IN MOTION</span><span class="intro-progress-line"></span><span>08</span></div></div>
+ <div class="intro-copy"><div class="intro-eyebrow">ORBIT / PROLOGUE</div><h2>每一面，<br>都是一个世界。</h2><p>正在进入南洋归埕</p><div class="intro-progress"><span id="resourceStatus" role="status">展板准备中 0 / 8</span><span class="intro-progress-line"></span><span>08</span></div></div>
  <div class="intro-orbit-wrap"><div class="intro-orbit" id="introOrbit"></div></div>
  <div class="intro-foot">侨乡金埭 · 传统村落文化活化与空间更新</div>
  <button class="intro-skip" id="skipIntro">跳过开场 ↗</button>
@@ -181,6 +197,7 @@ body.intro{overflow:hidden}
   <div class="stage-label" id="stageLabel">MEMORIES IN MOTION / 记忆正在汇聚</div>
   <div class="center-stamp"><div class="ring"></div><div class="vertical">归埕</div></div>
   <div class="cards" id="cards"></div>
+  <span class="stage-load-status" id="stageLoadStatus" role="status">展板加载中 0 / 8</span>
   <div class="caption"><div class="count" id="activeCount">03 / 08</div><h2 id="activeTitle">归埕意象与场地叙事</h2><p id="activeSub">从村落记忆，走向文化重聚</p></div>
  </div>
  <div class="actionrow">
@@ -218,10 +235,10 @@ body.intro{overflow:hidden}
    <p>这段项目影像将作为展板之外的另一条叙事路径，让观众从静态设计图进入时间、人物与场景共同构成的故事。</p>
    <div class="film-meta"><span>PROJECT FILM</span><span>约 4 分 41 秒</span><span>建议开启声音</span></div>
   </div>
-  <div><div class="film-frame"><video id="projectFilm" controls playsinline preload="metadata" poster="images/film-poster.jpg">
-   <source src="media/nanyang-guicheng-film.mp4" type="video/mp4">
+  <div><div class="film-frame"><video id="projectFilm" controls playsinline webkit-playsinline preload="none" poster="images/film-poster.jpg">
+   <source data-src="media/nanyang-guicheng-film.mp4" type="video/mp4">
    当前浏览器暂不支持视频播放，请使用现代浏览器打开本页面。
-  </video></div><div class="film-note">提示：首次播放需要加载视频文件；正式部署时请确保 media/nanyang-guicheng-film.mp4 与网页一同上传。</div></div>
+  </video><button class="film-load" id="loadFilm" type="button" aria-label="加载并播放项目影像">▶ 播放项目影像</button></div><div class="film-note">提示：首次播放需要加载视频文件；正式部署时请确保 media/nanyang-guicheng-film.mp4 与网页一同上传。</div></div>
  </div>
 </section>
 
@@ -276,119 +293,180 @@ const boards = [
 ];
 const imagePaths=["images/board-01.jpg","images/board-02.jpg","images/board-03.png","images/board-04.jpg","images/board-05.jpg","images/board-06.jpg","images/board-07.jpg","images/board-08.png"];
 const cardsBox=document.getElementById('cards'),stage=document.getElementById('stage'),grid=document.getElementById('boardGrid');
-const cards=[],uniqueCards=[];
-let phase='intro',active=2,angle=0,startTime=performance.now(),dragging=false,lastX=0,dragDistance=0,animFrame=0;
+const introOrbit=document.getElementById('introOrbit'),introOverlay=document.getElementById('introOverlay'),introWrap=document.querySelector('.intro-orbit-wrap');
+const cards=[],uniqueCards=[],introCards=[];
 const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const repeatCount=40;
-
-function makeCard(index,duplicate){
- const c=document.createElement('div');c.className='poster'+(duplicate?' duplicate':'');c.dataset.index=index;c.dataset.duplicate=duplicate?'1':'0';
- const im=document.createElement('img');im.src=imagePaths[index];im.alt=boards[index].title;im.loading=duplicate?'lazy':'eager';im.decoding='async';
- c.appendChild(im);cardsBox.appendChild(c);cards.push(c);if(!duplicate)uniqueCards.push(c);
- c.addEventListener('click',()=>{
-  if(dragDistance>8)return;
-  if(phase==='intro'){active=index;finishIntro();return}
-  if(active===index){openViewer(index)}else{active=index;renderDisplay();updateCaption()}
- });
- return c;
+let phase='intro',active=2,dragging=false,dragDistance=0,animFrame=0,introStart=0,introDone=false;
+let autoOrbit=false,autoTimer=0,hideTimer=0,layerTimer=0,resizeFrame=0,hiddenAt=0,viewerIndex=0;
+let pointer=null,suppressClickUntil=0,stageVisible=true;
+let stageWidth=0,introRadius=0,mobileStage=false;
+const loadedBoards=new Set();
+const loadingStatus=document.getElementById('resourceStatus');
+function updateLoading(index){
+ loadedBoards.add(index);
+ loadingStatus.textContent=loadedBoards.size===8?'MEMORY IN MOTION':`展板准备中 ${loadedBoards.size} / 8`;
+ document.getElementById('stageLoadStatus').textContent=loadedBoards.size===8?'':`展板加载中 ${loadedBoards.size} / 8`;
 }
-for(let i=0;i<8;i++)makeCard(i,false);
-for(let i=0;i<repeatCount-8;i++)makeCard(i%8,true);
-
-const introOrbit=document.getElementById('introOrbit'),introOverlay=document.getElementById('introOverlay');
-const introCards=[];
+function boardImage(index,priority='low',lazy=false){
+ const img=document.createElement('img');
+ img.alt=boards[index].title;img.decoding='async';img.loading=lazy?'lazy':'eager';img.fetchPriority=priority;
+ // Stable, shared URLs let the browser reuse its HTTP and decoded-image caches.
+ // No blobs, data URLs, canvas copies, or image construction inside animation frames.
+ img.addEventListener('load',()=>{img.parentElement?.classList.add('is-loaded');updateLoading(index);},{once:true});
+ img.src=imagePaths[index];
+ return img;
+}
+function makeCard(index){
+ const c=document.createElement('div');c.className='poster';c.dataset.index=index;
+ c.appendChild(boardImage(index,index===active?'high':'low'));cardsBox.appendChild(c);cards.push(c);uniqueCards.push(c);
+ c.addEventListener('click',()=>{
+  if(performance.now()<suppressClickUntil)return;
+  if(phase==='intro'){active=index;closeIntro();return;}
+  if(active===index)openViewer(index);else{active=index;renderDisplay();updateCaption();}
+ });
+}
+for(let i=0;i<8;i++)makeCard(i);
+// The old 32 transparent .duplicate posters were never visible or animated.
+// Retain the same eight visible prologue cards and the same eight gallery cards.
 for(let i=0;i<8;i++){
  const c=document.createElement('div');c.className='intro-card';
- const im=document.createElement('img');im.src=imagePaths[i];im.alt=boards[i].title;im.loading='eager';im.decoding='async';c.appendChild(im);introOrbit.appendChild(c);introCards.push(c);
+ c.appendChild(boardImage(i,i===0?'high':'low'));introOrbit.appendChild(c);introCards.push(c);
 }
-let introStart=performance.now(),introDone=false,autoOrbit=false,autoOrbitFrame=null;
-function renderIntroOrbit(elapsed){
- const wrap=document.querySelector('.intro-orbit-wrap'),w=wrap.clientWidth,mobile=window.innerWidth<760;
- const radius=(mobile?Math.min(w*.34,145):Math.min(w*.39,285));
- const rotation=-(Math.min(elapsed,2850)/2850)*360;
- introCards.forEach((c,i)=>{
-  const theta=i*45+rotation;
-  const rad=theta*Math.PI/180;
-  const depth=Math.cos(rad);
-  const z=Math.sin(rad);
-  const scale=.72+((depth+1)/2)*.43;
-  const x=Math.sin(rad)*radius;
-  const y=Math.cos(rad)*radius*.12;
-  c.style.transform=`translate(-50%,-50%) translate3d(${x}px,${y}px,${z*radius*.58}px) rotateY(${theta}deg) scale(${scale})`;
-  c.style.zIndex=String(Math.round(20+depth*20));
-  c.style.opacity=String(.3+Math.max(0,depth)*.7);
- });
-}
-function closeIntro(){if(introDone)return;introDone=true;phase='display';introOverlay.classList.add('is-leaving');document.body.classList.remove('intro');renderDisplay();updateCaption();setTimeout(()=>{introOverlay.style.display='none'},900)}
-document.getElementById('skipIntro').addEventListener('click',closeIntro);
-
 boards.forEach((b,i)=>{
  const item=document.createElement('button');item.className='board';item.type='button';
- item.innerHTML=`<div class="boardvisual"><img src="${imagePaths[i]}" alt="${b.title}" loading="lazy" decoding="async"></div><div class="boardmeta"><div class="boardnum">${String(i+1).padStart(2,'0')} / 08　${b.en}</div><div class="boardtitle">${b.title}</div><p class="boarddesc">${b.desc}</p><span class="openlabel">查看完整展板</span></div>`;
+ item.innerHTML=`<div class="boardvisual"></div><div class="boardmeta"><div class="boardnum">${String(i+1).padStart(2,'0')} / 08　${b.en}</div><div class="boardtitle">${b.title}</div><p class="boarddesc">${b.desc}</p><span class="openlabel">查看完整展板</span></div>`;
+ item.querySelector('.boardvisual').appendChild(boardImage(i,'low',true));
  item.addEventListener('click',()=>openViewer(i));grid.appendChild(item);
 });
-function place(c,transform,z,opacity,blur=0){c.style.transform=transform;c.style.zIndex=String(z);c.style.opacity=String(opacity);c.style.filter=blur?`blur(${blur}px)`:'none'}
-function renderIntro(progress){
- // Keep the main gallery already arranged as a ring underneath the prologue overlay.
- renderDisplay();
+function measureGeometry(){
+ stageWidth=stage.clientWidth;mobileStage=stageWidth<620;
+ const width=introWrap.clientWidth;
+ introRadius=window.innerWidth<760?Math.min(width*.34,145):Math.min(width*.39,285);
 }
+function renderIntroOrbit(elapsed){
+ const rotation=-(Math.min(elapsed,2850)/2850)*360;
+ for(let i=0;i<introCards.length;i++){
+  const c=introCards[i],theta=i*45+rotation,rad=theta*Math.PI/180;
+  const depth=Math.cos(rad),z=Math.sin(rad),scale=.72+((depth+1)/2)*.43;
+  c.style.transform=`translate(-50%,-50%) translate3d(${z*introRadius}px,${depth*introRadius*.12}px,${z*introRadius*.58}px) rotateY(${theta}deg) scale(${scale})`;
+  c.style.opacity=String(.3+Math.max(0,depth)*.7);
+  const layer=String(Math.round(20+depth*20));if(c.style.zIndex!==layer)c.style.zIndex=layer;
+ }
+}
+function releaseGalleryLayers(){cardsBox.classList.remove('is-moving');layerTimer=0;}
 function renderDisplay(){
- const w=stage.clientWidth,mobile=w<620;
- const radius=mobile?Math.min(w*.62,245):Math.min(w*.42,475);
- cards.forEach(c=>{
-  const i=Number(c.dataset.index),duplicate=c.dataset.duplicate==='1';
-  if(duplicate){place(c,'translate(-50%,-50%) scale(.15)',0,0);return}
-  const theta=(i-active)*45;
-  const rad=theta*Math.PI/180;
-  const depth=Math.cos(rad);
-  const x=Math.sin(rad)*radius;
-  const y=(1-depth)*(mobile?18:25);
-  const z=depth*radius*.62;
-  const scale=.7+((depth+1)/2)*.36;
-  const opacity=.22+Math.max(0,depth)*.78;
-  place(c,`translate(-50%,-50%) translate3d(${x}px,${y}px,${z}px) rotateY(${theta}deg) scale(${scale})`,Math.round(20+depth*20),opacity,depth<-.2?.4:0);
- });
+ const radius=mobileStage?Math.min(stageWidth*.62,245):Math.min(stageWidth*.42,475);
+ if(!reduced&&phase==='display'){cardsBox.classList.add('is-moving');clearTimeout(layerTimer);layerTimer=setTimeout(releaseGalleryLayers,1150);}
+ for(let i=0;i<cards.length;i++){
+  const c=cards[i],theta=(i-active)*45,rad=theta*Math.PI/180,depth=Math.cos(rad);
+  const x=Math.sin(rad)*radius,y=(1-depth)*(mobileStage?18:25),z=depth*radius*.62,scale=.7+((depth+1)/2)*.36;
+  c.style.transform=`translate(-50%,-50%) translate3d(${x}px,${y}px,${z}px) rotateY(${theta}deg) scale(${scale})`;
+  c.style.zIndex=String(Math.round(20+depth*20));c.style.opacity=String(.22+Math.max(0,depth)*.78);
+  c.style.filter=!mobileStage&&depth<-.2?'blur(.4px)':'none';
+ }
 }
 function updateCaption(){
  document.getElementById('activeCount').textContent=String(active+1).padStart(2,'0')+' / 08';
  document.getElementById('activeTitle').textContent=boards[active].title;
  document.getElementById('activeSub').textContent=boards[active].sub;
 }
-function finishIntro(){closeIntro()}
-function replay(){
- introDone=false;phase='intro';document.body.classList.add('intro');introOverlay.style.display='flex';introOverlay.classList.remove('is-leaving');introStart=performance.now();
- introCards.forEach(c=>{c.style.opacity='1'});
+function requestIntroFrame(){if(!animFrame&&!introDone&&!document.hidden&&!reduced)animFrame=requestAnimationFrame(tick);}
+function tick(now){
+ animFrame=0;if(introDone||document.hidden)return;
+ const elapsed=now-introStart;
+ renderIntroOrbit(elapsed);
+ if(elapsed>2920)closeIntro();else requestIntroFrame();
 }
-function step(d){if(phase==='intro')finishIntro();active=(active+d+8)%8;renderDisplay();updateCaption()}
-document.getElementById('prev').addEventListener('click',()=>step(-1));
-document.getElementById('next').addEventListener('click',()=>step(1));
+function closeIntro(){
+ if(introDone)return;
+ introDone=true;phase='display';cancelAnimationFrame(animFrame);animFrame=0;
+ introOverlay.classList.add('is-leaving');document.body.classList.remove('intro');renderDisplay();updateCaption();
+ clearTimeout(hideTimer);hideTimer=setTimeout(()=>{introOverlay.style.display='none';hideTimer=0;},reduced?0:900);
+ scheduleAutoOrbit();
+}
+function replay(){
+ clearTimeout(hideTimer);clearTimeout(autoTimer);autoTimer=0;cancelAnimationFrame(animFrame);animFrame=0;
+ introDone=false;phase='intro';introOverlay.style.display='flex';introOverlay.classList.remove('is-leaving');document.body.classList.add('intro');
+ measureGeometry();introStart=performance.now();hiddenAt=document.hidden?introStart:0;
+ if(reduced)closeIntro();else{renderIntroOrbit(0);requestIntroFrame();}
+}
+function step(d){if(phase==='intro')closeIntro();active=(active+d+8)%8;renderDisplay();updateCaption();}
+function scheduleAutoOrbit(){
+ clearTimeout(autoTimer);autoTimer=0;
+ if(!autoOrbit||!introDone||document.hidden||!stageVisible||viewer.classList.contains('open')||!film.paused)return;
+ autoTimer=setTimeout(()=>{autoTimer=0;step(1);scheduleAutoOrbit();},1700);
+}
+document.getElementById('skipIntro').addEventListener('click',closeIntro);
+document.getElementById('prev').addEventListener('click',()=>{step(-1);scheduleAutoOrbit();});
+document.getElementById('next').addEventListener('click',()=>{step(1);scheduleAutoOrbit();});
 document.getElementById('replay').addEventListener('click',replay);
 document.getElementById('allBtn').addEventListener('click',()=>document.getElementById('collection').scrollIntoView({behavior:reduced?'auto':'smooth'}));
 document.getElementById('watchFilmBtn').addEventListener('click',()=>document.getElementById('film').scrollIntoView({behavior:reduced?'auto':'smooth'}));
-document.getElementById('autoOrbitBtn').addEventListener('click',e=>{autoOrbit=!autoOrbit;e.currentTarget.textContent=autoOrbit?'Ⅱ 暂停环游':'▷ 自动环游';});
+document.getElementById('autoOrbitBtn').addEventListener('click',e=>{autoOrbit=!autoOrbit;e.currentTarget.textContent=autoOrbit?'Ⅱ 暂停环游':'▷ 自动环游';scheduleAutoOrbit();});
 document.getElementById('backTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:reduced?'auto':'smooth'}));
-stage.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;dragDistance=0;try{stage.setPointerCapture(e.pointerId)}catch(_){}});
-stage.addEventListener('pointermove',e=>{
- if(!dragging)return;const dx=e.clientX-lastX;dragDistance+=Math.abs(dx);lastX=e.clientX;
- if(phase==='intro'){angle+=dx*.008;renderIntro(Math.min(1,(performance.now()-startTime)/900))}
- else if(dragDistance>45){active=(active+(dx<0?1:7))%8;renderDisplay();updateCaption();dragDistance=0}
+stage.addEventListener('pointerdown',e=>{
+ if(e.isPrimary===false||e.button!==0)return;
+ pointer={id:e.pointerId,x:e.clientX,y:e.clientY,last:e.clientX,horizontal:false};dragging=true;dragDistance=0;
 });
-stage.addEventListener('pointerup',()=>{dragging=false;setTimeout(()=>dragDistance=0,100)});
-stage.addEventListener('pointercancel',()=>dragging=false);
-function tick(now){
- if(!introDone){const elapsed=now-introStart;renderIntroOrbit(elapsed);if(elapsed>2920)closeIntro()}
- if(autoOrbit && phase==='display'){
-  if(now-(window._lastOrbitStep||0)>1700){active=(active+1)%8;renderDisplay();updateCaption();window._lastOrbitStep=now}
+stage.addEventListener('pointermove',e=>{
+ if(!pointer||e.pointerId!==pointer.id)return;
+ const dx=e.clientX-pointer.x,dy=e.clientY-pointer.y;
+ if(!pointer.horizontal){
+  if(Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>8){pointer=null;dragging=false;return;}
+  if(Math.abs(dx)<8)return;
+  pointer.horizontal=true;try{stage.setPointerCapture(e.pointerId);}catch{}
  }
- animFrame=requestAnimationFrame(tick);
+ dragDistance+=e.clientX-pointer.last;pointer.last=e.clientX;suppressClickUntil=performance.now()+250;
+ if(Math.abs(dragDistance)>45){step(dragDistance<0?1:-1);dragDistance=0;}
+});
+function endDrag(e){
+ if(!pointer||pointer.id!==e.pointerId)return;
+ if(pointer.horizontal)suppressClickUntil=performance.now()+250;
+ pointer=null;dragging=false;dragDistance=0;scheduleAutoOrbit();
+}
+window.addEventListener('pointerup',endDrag);stage.addEventListener('pointercancel',endDrag);
+window.addEventListener('resize',()=>{
+ if(resizeFrame)return;
+ resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;measureGeometry();renderDisplay();if(!introDone)renderIntroOrbit(performance.now()-introStart);});
+},{passive:true});
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden){hiddenAt=performance.now();cancelAnimationFrame(animFrame);animFrame=0;clearTimeout(autoTimer);autoTimer=0;}
+ else{if(hiddenAt&&!introDone)introStart+=performance.now()-hiddenAt;hiddenAt=0;requestIntroFrame();scheduleAutoOrbit();}
+});
+if('IntersectionObserver' in window){
+ const stageObserver=new IntersectionObserver(entries=>{stageVisible=entries[0].isIntersecting;scheduleAutoOrbit();},{threshold:.05});stageObserver.observe(stage);
 }
 const viewer=document.getElementById('viewer'),full=document.getElementById('fullImage');
-function openViewer(i){full.src=imagePaths[i];full.alt=boards[i].title;document.getElementById('viewerTitle').textContent=String(i+1).padStart(2,'0')+' / 08　'+boards[i].title;viewer.classList.add('open');document.body.style.overflow='hidden'}
-function closeViewer(){viewer.classList.remove('open');document.body.style.overflow=''}
+function openViewer(i){
+ viewerIndex=i;full.decoding='async';full.src=imagePaths[i];full.alt=boards[i].title;
+ document.getElementById('viewerTitle').textContent=String(i+1).padStart(2,'0')+' / 08　'+boards[i].title;
+ viewer.classList.add('open');document.body.style.overflow='hidden';scheduleAutoOrbit();
+}
+function closeViewer(){viewer.classList.remove('open');document.body.style.overflow='';scheduleAutoOrbit();}
 document.getElementById('closeViewer').addEventListener('click',closeViewer);
-viewer.addEventListener('click',e=>{if(e.target===viewer)closeViewer()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer();if(e.key==='ArrowRight'&&viewer.classList.contains('open')){const n=(boards.findIndex(b=>b.title===document.getElementById('viewerTitle').textContent.split('　')[1])+1+8)%8;openViewer(n)}});
-if(reduced){phase='display';introDone=true;introOverlay.style.display='none';document.body.classList.remove('intro');renderDisplay();updateCaption()}else{renderIntroOrbit(0);renderDisplay();updateCaption();animFrame=requestAnimationFrame(tick)}
+viewer.addEventListener('click',e=>{if(e.target===viewer)closeViewer();});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&viewer.classList.contains('open'))closeViewer();
+ if(viewer.classList.contains('open')&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){e.preventDefault();openViewer((viewerIndex+(e.key==='ArrowRight'?1:7))%8);}
+});
+const film=document.getElementById('projectFilm'),filmButton=document.getElementById('loadFilm');
+let filmAttached=false;
+function attachFilm(){
+ if(filmAttached)return;
+ filmAttached=true;const source=film.querySelector('source');source.src=source.dataset.src;film.load();
+}
+filmButton.addEventListener('click',()=>{
+ attachFilm();filmButton.disabled=true;filmButton.textContent='视频加载中…';
+ const play=film.play();
+ if(play)play.catch(()=>{filmButton.disabled=false;filmButton.hidden=false;filmButton.textContent='▶ 点击播放项目影像';});
+});
+film.addEventListener('playing',()=>{filmButton.hidden=true;filmButton.disabled=false;scheduleAutoOrbit();});
+film.addEventListener('pause',scheduleAutoOrbit);film.addEventListener('ended',scheduleAutoOrbit);
+film.addEventListener('error',()=>{filmButton.hidden=false;filmButton.disabled=false;filmButton.textContent='视频未能载入，点击重试';});
+measureGeometry();renderDisplay();updateCaption();
+if(reduced){introDone=true;phase='display';introOverlay.style.display='none';document.body.classList.remove('intro');}
+else{introStart=performance.now();renderIntroOrbit(0);requestIntroFrame();}
+
 </script>
 </body>
 </html>
