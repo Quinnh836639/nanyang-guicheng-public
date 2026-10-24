@@ -166,6 +166,10 @@ body.intro .poster{transition:none}
 .film-load[hidden]{display:none}.film-load:disabled{cursor:progress}
 @media(max-width:760px){.intro-card{box-shadow:0 10px 24px #49332620}.poster{box-shadow:0 12px 30px #44312522}.intro-skip{backdrop-filter:none}}
 @media(prefers-reduced-motion:reduce){.poster img,.intro-card img{transition:none}}
+@supports(content-visibility:auto){
+ .boardgrid{content-visibility:auto;contain-intrinsic-size:auto 1150px}
+ @media(max-width:850px){.boardgrid{contain-intrinsic-size:auto 2250px}}
+}
 
 </style>
 </head>
@@ -236,9 +240,9 @@ body.intro .poster{transition:none}
    <div class="film-meta"><span>PROJECT FILM</span><span>约 4 分 41 秒</span><span>建议开启声音</span></div>
   </div>
   <div><div class="film-frame"><video id="projectFilm" controls playsinline webkit-playsinline preload="none" poster="images/film-poster.jpg">
-   <source data-src="media/nanyang-guicheng-film.mp4" type="video/mp4">
+   <source src="media/nanyang-guicheng-film.mp4" type="video/mp4">
    当前浏览器暂不支持视频播放，请使用现代浏览器打开本页面。
-  </video><button class="film-load" id="loadFilm" type="button" aria-label="加载并播放项目影像">▶ 播放项目影像</button></div><div class="film-note">提示：首次播放需要加载视频文件；正式部署时请确保 media/nanyang-guicheng-film.mp4 与网页一同上传。</div></div>
+  </video><button class="film-load" id="loadFilm" type="button" aria-label="加载并播放项目影像">▶ 播放项目影像</button></div><div class="film-note"><span id="filmStatus" role="status" aria-live="polite">点击播放后加载视频；网络较慢时请稍候。</span> <a href="media/nanyang-guicheng-film.mp4" target="_blank" rel="noopener">直接打开视频 ↗</a></div></div>
  </div>
 </section>
 
@@ -303,6 +307,7 @@ let stageWidth=0,introRadius=0,mobileStage=false;
 const loadedBoards=new Set();
 const loadingStatus=document.getElementById('resourceStatus');
 function updateLoading(index){
+ if(loadedBoards.has(index))return;
  loadedBoards.add(index);
  loadingStatus.textContent=loadedBoards.size===8?'MEMORY IN MOTION':`展板准备中 ${loadedBoards.size} / 8`;
  document.getElementById('stageLoadStatus').textContent=loadedBoards.size===8?'':`展板加载中 ${loadedBoards.size} / 8`;
@@ -328,14 +333,31 @@ function makeCard(index){
 for(let i=0;i<8;i++)makeCard(i);
 // The old 32 transparent .duplicate posters were never visible or animated.
 // Retain the same eight visible prologue cards and the same eight gallery cards.
-for(let i=0;i<8;i++){
- const c=document.createElement('div');c.className='intro-card';
- c.appendChild(boardImage(i,i===0?'high':'low'));introOrbit.appendChild(c);introCards.push(c);
+function createIntroCards(){
+ if(introCards.length)return;
+ const fragment=document.createDocumentFragment();
+ for(let i=0;i<8;i++){
+  const c=document.createElement('div');c.className='intro-card';
+  c.appendChild(boardImage(i,i===0?'high':'low'));fragment.appendChild(c);introCards.push(c);
+ }
+ introOrbit.appendChild(fragment);
 }
+function releaseIntroCards(){introOrbit.replaceChildren();introCards.length=0;}
+if(!reduced)createIntroCards();
+// Defer offscreen index images even on browsers with generous native lazy thresholds.
+const indexObserver='IntersectionObserver' in window?new IntersectionObserver(entries=>{
+ for(const entry of entries){
+  if(!entry.isIntersecting)continue;
+  const visual=entry.target;
+  visual.appendChild(boardImage(Number(visual.dataset.board),'low',true));
+  indexObserver.unobserve(visual);
+ }
+},{rootMargin:'400px 0px'}):null;
 boards.forEach((b,i)=>{
  const item=document.createElement('button');item.className='board';item.type='button';
  item.innerHTML=`<div class="boardvisual"></div><div class="boardmeta"><div class="boardnum">${String(i+1).padStart(2,'0')} / 08　${b.en}</div><div class="boardtitle">${b.title}</div><p class="boarddesc">${b.desc}</p><span class="openlabel">查看完整展板</span></div>`;
- item.querySelector('.boardvisual').appendChild(boardImage(i,'low',true));
+ const visual=item.querySelector('.boardvisual');visual.dataset.board=i;
+ if(indexObserver)indexObserver.observe(visual);else visual.appendChild(boardImage(i,'low',true));
  item.addEventListener('click',()=>openViewer(i));grid.appendChild(item);
 });
 function measureGeometry(){
@@ -381,11 +403,12 @@ function closeIntro(){
  if(introDone)return;
  introDone=true;phase='display';cancelAnimationFrame(animFrame);animFrame=0;
  introOverlay.classList.add('is-leaving');document.body.classList.remove('intro');renderDisplay();updateCaption();
- clearTimeout(hideTimer);hideTimer=setTimeout(()=>{introOverlay.style.display='none';hideTimer=0;},reduced?0:900);
+ clearTimeout(hideTimer);hideTimer=setTimeout(()=>{introOverlay.style.display='none';releaseIntroCards();hideTimer=0;},reduced?0:900);
  scheduleAutoOrbit();
 }
 function replay(){
  clearTimeout(hideTimer);clearTimeout(autoTimer);autoTimer=0;cancelAnimationFrame(animFrame);animFrame=0;
+ if(!reduced)createIntroCards();
  introDone=false;phase='intro';introOverlay.style.display='flex';introOverlay.classList.remove('is-leaving');document.body.classList.add('intro');
  measureGeometry();introStart=performance.now();hiddenAt=document.hidden?introStart:0;
  if(reduced)closeIntro();else{renderIntroOrbit(0);requestIntroFrame();}
@@ -450,19 +473,46 @@ document.addEventListener('keydown',e=>{
  if(viewer.classList.contains('open')&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){e.preventDefault();openViewer((viewerIndex+(e.key==='ArrowRight'?1:7))%8);}
 });
 const film=document.getElementById('projectFilm'),filmButton=document.getElementById('loadFilm');
-let filmAttached=false;
-function attachFilm(){
- if(filmAttached)return;
- filmAttached=true;const source=film.querySelector('source');source.src=source.dataset.src;film.load();
+// Keep a real native source: WeChat controls and JS-disabled playback can resolve it.
+// preload=none still prevents upfront transfer in browsers that honor the standard.
+const filmStatus=document.getElementById('filmStatus');
+const filmSource=film.querySelector('source');
+let filmWaitTimer=0;
+function clearFilmWait(){clearTimeout(filmWaitTimer);filmWaitTimer=0;}
+function showFilmRetry(message){
+ clearFilmWait();filmButton.hidden=false;filmButton.disabled=false;
+ filmButton.textContent='▶ 继续播放 / 重试';filmStatus.textContent=message;
+}
+function startFilmWait(){
+ clearFilmWait();
+ filmWaitTimer=setTimeout(()=>{
+  if(film.paused||film.readyState<3)showFilmRetry('视频加载较慢，请再次点击播放；也可直接打开视频。');
+ },12000);
 }
 filmButton.addEventListener('click',()=>{
- attachFilm();filmButton.disabled=true;filmButton.textContent='视频加载中…';
- const play=film.play();
- if(play)play.catch(()=>{filmButton.disabled=false;filmButton.hidden=false;filmButton.textContent='▶ 点击播放项目影像';});
+ // Call play synchronously from the user gesture; do not await fetch/decode first.
+ if(film.error||film.networkState===HTMLMediaElement.NETWORK_NO_SOURCE)film.load();
+ filmButton.disabled=true;filmButton.textContent='视频加载中…';
+ filmStatus.textContent='正在连接视频，请稍候…';startFilmWait();
+ try{
+  const attempt=film.play();
+  if(attempt&&typeof attempt.catch==='function')attempt.catch(error=>{
+   if(error.name==='NotAllowedError')showFilmRetry('微信或浏览器需要再次点击播放，请重试。');
+   else if(error.name==='NotSupportedError')showFilmRetry('当前浏览器未能读取视频，可尝试直接打开或在系统浏览器中播放。');
+   else showFilmRetry('视频未能开始播放，请重试或直接打开视频。');
+  });
+ }catch{showFilmRetry('视频未能开始播放，请重试或直接打开视频。');}
 });
-film.addEventListener('playing',()=>{filmButton.hidden=true;filmButton.disabled=false;scheduleAutoOrbit();});
-film.addEventListener('pause',scheduleAutoOrbit);film.addEventListener('ended',scheduleAutoOrbit);
-film.addEventListener('error',()=>{filmButton.hidden=false;filmButton.disabled=false;filmButton.textContent='视频未能载入，点击重试';});
+film.addEventListener('play',()=>{filmButton.hidden=true;scheduleAutoOrbit();startFilmWait();});
+film.addEventListener('playing',()=>{
+ clearFilmWait();filmButton.hidden=true;filmButton.disabled=false;
+ filmStatus.textContent='正在播放；可使用播放器控制暂停、进度和音量。';scheduleAutoOrbit();
+});
+film.addEventListener('waiting',()=>{filmStatus.textContent='视频缓冲中，请稍候…';startFilmWait();});
+film.addEventListener('pause',()=>{clearFilmWait();if(!film.error)filmStatus.textContent='已暂停，可通过播放器继续播放。';scheduleAutoOrbit();});
+film.addEventListener('ended',()=>{clearFilmWait();filmStatus.textContent='播放结束，可通过播放器重播。';scheduleAutoOrbit();});
+film.addEventListener('error',()=>showFilmRetry('视频加载失败，请重试或直接打开视频。'));
+filmSource.addEventListener('error',()=>showFilmRetry('视频地址暂时无法读取，请检查网络或直接打开视频。'));
 measureGeometry();renderDisplay();updateCaption();
 if(reduced){introDone=true;phase='display';introOverlay.style.display='none';document.body.classList.remove('intro');}
 else{introStart=performance.now();renderIntroOrbit(0);requestIntroFrame();}
